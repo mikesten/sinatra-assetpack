@@ -3,18 +3,13 @@ require 'rack/test'
 module Sinatra
   module AssetPack
     def self.registered(app)
-      unless app.root?
-        raise Error, "Please set :root in your Sinatra app."
-      end
-
-      app.extend  ClassMethods
       app.helpers Helpers
     end
 
     # Returns a list of formats that can be served.
     # Anything not in this list will be rejected.
     def self.supported_formats
-      @supported_formats ||= %w(css js png jpg gif otf eot ttf woff htc)
+      @supported_formats ||= %w(css js png jpg gif svg otf eot ttf woff htc)
     end
 
     # Returns a map of what MIME format each Tilt type returns.
@@ -54,8 +49,13 @@ module Sinatra
     autoload :Configurator,  "#{PREFIX}/assetpack/configurator"
     autoload :HashArray,     "#{PREFIX}/assetpack/hasharray"
 
+    include ClassMethods
+
     Error = Class.new(StandardError)
 
     require "#{PREFIX}/assetpack/version"
   end
+
+  # Autoload in Sinatra classic mode
+  register AssetPack
 end

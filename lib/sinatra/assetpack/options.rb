@@ -41,10 +41,19 @@ module Sinatra
       include Configurator
 
       def initialize(app, &blk)
+        unless app.root?
+          raise Error, "Please set :root in your Sinatra app."
+        end
+
         @app             = app
         @js_compression  = :jsmin
         @css_compression = :simple
-        @output_path     = app.public
+
+        begin
+          @output_path   = app.public
+        rescue NoMethodError
+          @output_path   = app.public_folder
+        end
 
         @js_compression_options  = Hash.new
         @css_compression_options = Hash.new
