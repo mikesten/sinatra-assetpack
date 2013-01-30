@@ -30,6 +30,7 @@ module Sinatra
 
             content_type package.type
             last_modified mtime
+            assets_expires
             contents
           end
         end
@@ -43,24 +44,25 @@ module Sinatra
 
             # Sanity checks
             pass unless AssetPack.supported_formats.include?(fmt)
-            fn = asset_path_for(file, from)  or pass
+            fn = asset_path_for(file, from) or pass
 
-            pass  if settings.assets.ignored?("#{path}/#{file}")
+            pass if settings.assets.ignored?("#{path}/#{file}")
 
             # Send headers
             content_type fmt.to_sym
             last_modified File.mtime(fn).to_i
-            expires 86400*30, :public
+            assets_expires
 
             format = File.extname(fn)[1..-1]
 
             if AssetPack.supported_formats.include?(format)
-              # It's a raw file, just send it
-              not_found  unless format == fmt
-
+              # Static file
               if fmt == 'css'
+                # Matching static file format
+                pass unless fmt == File.extname(fn)[1..-1]
                 @template_cache.fetch(fn) { asset_filter_css File.read(fn) }
               else
+                # It's a raw file, just send it
                 send_file fn
               end
             else

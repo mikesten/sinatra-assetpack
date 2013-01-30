@@ -1,4 +1,5 @@
 require 'rack/test'
+require 'backports' if RUBY_VERSION < "1.9"
 
 module Sinatra
   module AssetPack
@@ -47,7 +48,6 @@ module Sinatra
     autoload :Image,         "#{PREFIX}/assetpack/image"
     autoload :Css,           "#{PREFIX}/assetpack/css"
     autoload :Configurator,  "#{PREFIX}/assetpack/configurator"
-    autoload :HashArray,     "#{PREFIX}/assetpack/hasharray"
 
     include ClassMethods
 

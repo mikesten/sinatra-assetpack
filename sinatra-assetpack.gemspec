@@ -15,6 +15,9 @@ Gem::Specification.new do |s|
   s.add_dependency "sinatra"
   s.add_dependency "jsmin"
   s.add_dependency "rack-test"
+  if RUBY_VERSION < "1.9"
+    s.add_runtime_dependency "backports"
+  end
   s.add_development_dependency "yui-compressor"
   s.add_development_dependency "sass"
   s.add_development_dependency "haml"
@@ -23,4 +26,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha"
   s.add_development_dependency "stylus"
   s.add_development_dependency "uglifier"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "less"
 end

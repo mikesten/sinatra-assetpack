@@ -1,10 +1,12 @@
 require 'contest'
 require 'jsmin'
 require 'tilt'
+require 'haml'
+require 'sass'
 require 'stylus'
 require 'rack/test'
 require 'yaml'
-require 'mocha'
+require 'mocha/setup'
 
 require File.expand_path('../app/app.rb', __FILE__)
 

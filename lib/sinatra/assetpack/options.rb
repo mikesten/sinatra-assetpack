@@ -159,6 +159,14 @@ module Sinatra
 
       attrib :prebuild          # Bool
 
+      def expires(*args)
+        if args.empty?
+          @expires
+        else
+          @expires = args
+        end
+      end
+
       def js_compression(name=nil, options=nil)
         @js_compression = name  unless name.nil?
         @js_compression_options = options  if options.is_a?(Hash)
@@ -245,9 +253,16 @@ module Sinatra
         file.sub(/^(.*)(\.[^\.]+)$/) { file, extension = $1, $2 }
 
         # Remove cache-buster (/js/app.28389.js => /js/app)
-        file = $1  if file =~ /^(.*)\.[0-9]+$/
+        file = $1 if file =~ /^(.*)\.[0-9]+$/
 
-        Dir[File.join(app.root, from, "#{file}#{extension}")].first
+        matches = Dir[File.join(app.root, from, "#{file}.*")]
+
+        # Fix for filenames with dots (can't do this with glob)
+        matches.select! { |f| f =~ /#{file}\.[^.]+$/ }
+
+        # Sort static file match first
+        matches.sort! { |f, _| File.basename(f) == "#{file}#{extension}" ? -1 : 1 }
+        matches.first
       end
 
       # Writes `public/#{path}` based on contents of `output`.
@@ -258,7 +273,7 @@ module Sinatra
         yield path  if block_given?
 
         FileUtils.mkdir_p File.dirname(path)
-        File.open(path, 'w') { |f| f.write output }
+        File.open(path, 'wb') { |f| f.write output }
 
         if mtime
           File.utime mtime, mtime, path
@@ -305,7 +320,7 @@ module Sinatra
         paths  = paths.uniq
         tuples = paths.map { |key| [key, files[key]] }
 
-        HashArray[*tuples.flatten]
+        Hash[*tuples.flatten]
       end
 
     private

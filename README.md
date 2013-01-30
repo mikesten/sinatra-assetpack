@@ -1,5 +1,13 @@
 # [Sinatra AssetPack](http://ricostacruz.com/sinatra-assetpack)
-#### Asset packer for Sinatra
+
+>  Package your assets transparently in Sinatra.
+
+[![Build Status](https://travis-ci.org/rstacruz/sinatra-assetpack.png)](https://travis-ci.org/rstacruz/sinatra-assetpack)
+[![Dependency Status](https://gemnasium.com/rstacruz/sinatra-assetpack.png)](https://gemnasium.com/rstacruz/sinatra-assetpack)
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/rstacruz/sinatra-assetpack)
+
+How it works
+------------
 
 This is *the* most convenient way to set up your CSS/JS (and images) in a 
 [Sinatra](http://sinatrarb.com) app. Seriously. No need for crappy routes to 
@@ -9,9 +17,9 @@ render Sass or whatever. No-siree!
    * JavaScript/CoffeeScript files in `/app/js`
    * CSS/Sass/Less/CSS files in `/app/css`
    * Images into `/app/images`
-3. Add `register Sinatra::AssetPack` and set up options to your app (see below)
-4. Use `<%= css :application %>` to your layouts. Use this instead of
-   messy *script* and *link* tags
+3. Add `register Sinatra::AssetPack` and set up options to your app (see below).
+4. Use `<%= js :app %>` and `<%= css :application %>` to your layouts. Use these instead of
+   messy *script* and *link* tags.
 5. BOOM! You're in business baby!
 
 Installation
@@ -527,6 +535,32 @@ end
 # >> Listening on 0.0.0.0:4567, CTRL+C to stop
 ```
 
+### assets.expires
+Sets cache control headers for all assets handled by AssetPack. Defaults to `expires 86400*30, :public`. Passes the arguments to [Sinatras #expires](http://rubydoc.info/gems/sinatra/Sinatra/Helpers#expires-instance_method).
+
+``` ruby
+# Usage:
+expires amount, *values
+```
+
+#### Example
+In this example all assets get cached for a year.
+
+``` ruby
+class App < Sinatra::Base
+  assets {
+    js_compression :closure
+
+    js :application, [
+      '/js/vendor/jquery.*.js',
+      '/js/vendor/jquery.js'
+    ]
+    expires 86400*365, :public
+  }
+end
+```
+
+
 API reference: helpers
 ----------------------
 
@@ -636,6 +670,11 @@ class Main
   register Sinatra::CompassSupport
 end
 ```
+
+Running the tests
+---------------
+
+    rake
 
 Acknowledgements
 ----------------
